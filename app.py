@@ -10,21 +10,30 @@ from typing import List, Callable, TypeVar, ParamSpec, Any
 from functools import wraps
 import os
 
-# Type variables to preserve the input and return types
-P = ParamSpec("P")
-R = TypeVar("R")
+# Define generic type variables
+P = ParamSpec("P")  # Represents parameters of the function
+R = TypeVar("R")    # Represents return type of the function
+
 def handle_exceptions(func: Callable[P, R]) -> Callable[P, R]:
-    @wraps(func)
+    """
+    Decorator to handle unexpected exceptions in FastAPI route functions.
+    Returns a 500 HTTP error for unhandled exceptions.
+    """
+    @wraps(func)  # Preserves metadata of the original function
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
         try:
+            # Call the original function
             return func(*args, **kwargs)
-        except HTTPException: raise  # Allow FastAPI-defined HTTP exceptions to propagate
+        except HTTPException:
+            # Let FastAPI's HTTP exceptions pass through
+            raise
         except Exception as e:
+            # Catch all other exceptions and return HTTP 500 response
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"Internal Server Error: {e}"
             )
-    return wrapper
+    return wrapper  # Return the wrapped function
 
 basedir = os.path.dirname(__file__)
 csv_path = os.path.join(basedir, "clean_data.csv")
