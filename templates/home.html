@@ -191,7 +191,7 @@
         </div>
       </div>
       <footer class="footer">
-        <p>Please verify the exam schedule with the provided <a href="https://cciitpatna-my.sharepoint.com/:x:/g/personal/pic_cetc_iitp_ac_in/EeM_ohnd8QFBjg3eiRxZBhUBMSvsQn0BmMKBOtvKv81psQ?e=aZ60uM">Excel file</a>. If you have any issues, contact the administration.</p>
+        <p>Please verify the exam schedule with the provided <a href="{{excel_file_url}}">Excel file</a>. If you have any issues, contact the administration.</p>
       </footer>   
     </main>
     
@@ -214,5 +214,20 @@
     </div>
     
     <script src="/static/script.js"></script>
+    <script>
+      const studentDownload = document.getElementById('student-download');
+      const facultyDownload = document.getElementById('faculty-download');
+      // Download Buttons
+      studentDownload.addEventListener('click', () => {
+          window.open(`{{excel_file_url}}`, '_blank');
+          showToast('Excel file downloaded successfully');
+      });
+
+      facultyDownload.addEventListener('click', () => {
+          window.open(`{{excel_file_url}}`, '_blank');
+          showToast('Excel file downloaded successfully');
+      });
+
+    </script>
   </body>
 </html>

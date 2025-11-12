@@ -16,8 +16,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const facultyTableBody = document.getElementById('faculty-table-body');
     const studentSearchTerm = document.getElementById('student-search-term');
     const facultySearchTerm = document.getElementById('faculty-search-term');
-    const studentDownload = document.getElementById('student-download');
-    const facultyDownload = document.getElementById('faculty-download');
     const toast = document.getElementById('toast');
     const toastMessage = document.getElementById('toast-message');
     const loading = document.getElementById('loading');
@@ -187,17 +185,6 @@ document.addEventListener('DOMContentLoaded', function () {
             facultyTableBody.appendChild(row);
         });
     }
-
-    // Download Buttons
-    studentDownload.addEventListener('click', () => {
-        window.open(`https://cciitpatna-my.sharepoint.com/:x:/g/personal/pic_cetc_iitp_ac_in/EeM_ohnd8QFBjg3eiRxZBhUBMSvsQn0BmMKBOtvKv81psQ?e=aZ60uM`, '_blank');
-        showToast('Excel file downloaded successfully');
-    });
-
-    facultyDownload.addEventListener('click', () => {
-        window.open(`https://cciitpatna-my.sharepoint.com/:x:/g/personal/pic_cetc_iitp_ac_in/EeM_ohnd8QFBjg3eiRxZBhUBMSvsQn0BmMKBOtvKv81psQ?e=aZ60uM`, '_blank');
-        showToast('Excel file downloaded successfully');
-    });
 
     // Toast Function
     function showToast(message, isError = false) {

@@ -35,6 +35,8 @@ def handle_exceptions(func: Callable[P, R]) -> Callable[P, R]:
             )
     return wrapper  # Return the wrapped function
 
+excel_file_url = "https://cciitpatna-my.sharepoint.com/:x:/g/personal/pic_cetc_iitp_ac_in/Ead7bbOsScZJnX1Bb17LuvEBJcCwJGgAgoItalETUVONbw?e=5l8S2D"
+
 basedir = os.path.dirname(__file__)
 csv_path = os.path.join(basedir, "clean_data.csv")
 template_path = os.path.join(basedir, "templates")
@@ -79,7 +81,8 @@ def get_dataframe(request: Request) -> pd.DataFrame:
 app = FastAPI() # lifespan=lifespan
 
 def find_by_rollno(df: pd.DataFrame, rollno: str) -> pd.DataFrame:
-    return df[df['rollno'] == rollno.upper()]
+    result = df[df['rollno'] == rollno.upper()].copy()
+    return result.sort_values(by='date')
 
 def find_by_coursecode(df: pd.DataFrame, course_code: str) -> pd.DataFrame:
     filtered = df[df['coursecode'].str.upper() == course_code.upper()]
@@ -124,7 +127,8 @@ def get_faculty_by_coursecode(
 @app.get("/", response_class=HTMLResponse)
 def home(request: Request):
     return templates.TemplateResponse("home.html", {
-        "request": request
+        "request": request,
+        "excel_file_url": excel_file_url,
     })
 
 if __name__ == "__main__":
