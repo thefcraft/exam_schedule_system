@@ -1,48 +1,66 @@
+import os
+import sys
+from hashlib import sha256
+
 import pandas as pd
 from tqdm import tqdm
 
 # Enable tqdm with pandas
 tqdm.pandas()
 
-df = pd.read_csv("exam_room.csv")
+filename: str = "exam_room.csv"
+with open(filename, "rb") as f:
+    filehash: str = sha256(f.read()).hexdigest()
+print(f"HASH: {filehash}")
+if os.path.exists(filename + ".hash"):
+    with open(filename + ".hash", "r") as f:
+        old_hash: str = f.read()
+    if filehash == old_hash:
+        print("NOT MODIFIED.")
+        sys.exit(0)
+with open(filename + ".hash", "w") as f:
+    f.write(filehash)
+
+df = pd.read_csv(filename)
 df.drop(columns=["Sl No"], axis=1, inplace=True)
 
 try:
-    df['rollnolist'] = df['rollnolist'].str.strip(',')
+    df["rollnolist"] = df["rollnolist"].str.strip(",")
 except KeyError:
-    df['rollnolist'] = df['roll no'].str.strip(',')
+    df["rollnolist"] = df["roll no"].str.strip(",")
 
-df['rollno'] = df['rollnolist'].str.split(',')
-df = df.explode('rollno')
-df = df.drop(['rollnolist'], axis=1)
+df["rollno"] = df["rollnolist"].str.split(",")
+df = df.explode("rollno")
+df = df.drop(["rollnolist"], axis=1)
 
 df.to_csv("exam.csv", index=False)
-df = pd.read_csv('exam.csv')
+df = pd.read_csv("exam.csv")
 
 # Build course code/name map
-df_map = pd.read_csv('code_name_map.csv')
-df3 = pd.DataFrame(columns=['Course Code', 'Course Name'])
+df_map = pd.read_csv("code_name_map.csv")
+df3 = pd.DataFrame(columns=["Course Code", "Course Name"])
 
 for i in tqdm(range(len(df_map)), desc="Building course map"):
     item = df_map.iloc[i]
-    codes = item['Course Code'].split('/')
-    name = item['Course Name']
+    codes = item["Course Code"].split("/")
+    name = item["Course Name"]
     for code in codes:
-        df3 = pd.concat([pd.DataFrame([{
-            'Course Code': code,
-            'Course Name': name
-        }]), df3])
+        df3 = pd.concat(
+            [pd.DataFrame([{"Course Code": code, "Course Name": name}]), df3]
+        )
 
 df3 = df3.drop_duplicates()
-df3 = df3.set_index('Course Code')
+df3 = df3.set_index("Course Code")
+
 
 # Faster + tqdm progress with map
 def tmp(x):
     try:
-        return df3.loc[x]['Course Name']
+        return df3.loc[x]["Course Name"]
     except Exception:
-        return ''
+        return ""
 
-df['coursename'] = df['coursecode'].progress_map(tmp) 
 
-df.to_csv('clean_data.csv')
+df["coursename"] = df["coursecode"].progress_map(tmp)
+
+df.to_csv("clean_data.csv")
