@@ -18,16 +18,52 @@ if os.path.exists(filename + ".hash"):
     if filehash == old_hash:
         print("NOT MODIFIED.")
         sys.exit(0)
-with open(filename + ".hash", "w") as f:
-    f.write(filehash)
 
 df = pd.read_csv(filename)
-df.drop(columns=["Sl No"], axis=1, inplace=True)
+df.drop(columns=["Sl No"], inplace=True)
 
 try:
     df["rollnolist"] = df["rollnolist"].str.strip(",")
 except KeyError:
-    df["rollnolist"] = df["roll no"].str.strip(",")
+    try:
+        df["rollnolist"] = df["roll no"].str.strip(",")
+    except KeyError:
+
+        def collect_rolls(row: pd.DataFrame):
+            return ",".join(
+                value
+                for key, value in row.items()
+                if isinstance(value, str)
+                and (
+                    key == "Roll No of alloted Students"
+                    or str(key).startswith("Unnamed: ")
+                )
+            )
+
+        df["rollnolist"] = df.apply(collect_rolls, axis=1)
+if "Course No" in df.columns and "coursecode" not in df.columns:
+    df["coursecode"] = df["Course No"]
+    df = df.drop(columns=["Course No"])
+if "Date" in df.columns and "date" not in df.columns:
+    df["date"] = df["Date"]
+    df = df.drop(columns=["Date"])
+if "SESSION" in df.columns and "shift" not in df.columns:
+    df["shift"] = df["SESSION"]
+    df = df.drop(columns=["SESSION"])
+if "Room No" in df.columns and "roomno" not in df.columns:
+    df["roomno"] = df["Room No"]
+    df = df.drop(columns=["Room No"])
+if "No of Students" in df.columns:
+    df = df.drop(columns=["No of Students"])
+if "Roll No of alloted Students" in df.columns:
+    df = df.drop(columns=["Roll No of alloted Students"])
+if "day" not in df.columns:
+    df["day"] = pd.to_datetime(
+        df["date"], format="mixed", dayfirst=True, errors="coerce"
+    ).dt.day_name()
+df = df.drop(
+    columns=[column for column in df.columns if column.startswith("Unnamed: ")]
+)
 
 df["rollno"] = df["rollnolist"].str.split(",")
 df = df.explode("rollno")
@@ -64,3 +100,6 @@ def tmp(x):
 df["coursename"] = df["coursecode"].progress_map(tmp)
 
 df.to_csv("clean_data.csv")
+
+with open(filename + ".hash", "w") as f:
+    f.write(filehash)
