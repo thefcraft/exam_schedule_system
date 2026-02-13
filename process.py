@@ -1,6 +1,7 @@
 import os
 import sys
 from hashlib import sha256
+from datetime import datetime
 
 import pandas as pd
 from tqdm import tqdm
@@ -57,9 +58,23 @@ if "No of Students" in df.columns:
     df = df.drop(columns=["No of Students"])
 if "Roll No of alloted Students" in df.columns:
     df = df.drop(columns=["Roll No of alloted Students"])
+
+current_year = str(datetime.now().year)
+def fix_year(x: str | float) -> str | float:
+    if not isinstance(x, str):
+        return x
+    parts = x.replace("/", "-").split("-")
+    if len(parts[-1]) == 3:  # year has 3 digits
+        parts[-1] = current_year
+    return "-".join(parts)
+
+
+df["date"] = df["date"].map(fix_year)
+
 if "day" not in df.columns:
     df["day"] = pd.to_datetime(
-        df["date"], format="mixed", dayfirst=True, errors="coerce"
+        df["date"],
+        dayfirst=True,  # , format="mixed", errors="coerce"
     ).dt.day_name()
 df = df.drop(
     columns=[column for column in df.columns if column.startswith("Unnamed: ")]
