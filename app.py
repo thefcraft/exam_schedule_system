@@ -35,7 +35,7 @@ def handle_exceptions(func: Callable[P, R]) -> Callable[P, R]:
             )
     return wrapper  # Return the wrapped function
 
-excel_file_url = "https://cciitpatna-my.sharepoint.com/:x:/g/personal/pic_cetc_iitp_ac_in/IQDX0b67PeFgS6NiWC7wgUQ2AUToNE59dRa2nfiy0zyj3nU?e=pqi0Nx&CID=3a532a56-88d2-45fa-2c4f-360cbc7ec5b6"
+excel_file_url = "https://cciitpatna-my.sharepoint.com/:x:/g/personal/pic_cetc_iitp_ac_in/IQC1WTJ8gkBMTaipnniSWUP9AfbMTmfqMHBvkla094sfeQY?e=mhNYVg"
 
 basedir = os.path.dirname(__file__)
 csv_path = os.path.join(basedir, "clean_data.csv")
